@@ -11,9 +11,10 @@ import CalendarView from "@/components/CalendarView";
 import CalendarHeader from "@/components/CalendarHeader";
 import { getMonth } from "../utils";
 import GlobalContext from "@/context/GlobalContext";
+import EventModal from "@/components/EventModal";
 
 export default function Home() {
-  const { monthIndex } = useContext(GlobalContext);
+  const { monthIndex, showEventModal } = useContext(GlobalContext);
   const [currentMonth, setCurrentMonth] = useState(getMonth());
 
   // Observe changes in monthIndex
@@ -36,6 +37,7 @@ export default function Home() {
       </Head>
 
       <main className="flex min-h-screen w-full flex-row justify-between bg-gradient-to-b from-[#ffffff] to-[#c4c4c4]">
+        {showEventModal && <EventModal />}
         <div
           id="menu"
           className="flex w-2/12 flex-col gap-4 bg-black p-4 text-white"

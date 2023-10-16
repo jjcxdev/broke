@@ -9,10 +9,13 @@ interface ContextWrapperProps {
 
 const ContextWrapper: FC<ContextWrapperProps> = ({ children }) => {
   const [monthIndex, setMonthIndex] = useState<number>(dayjs().month());
+  const [showEventModal, setShowEventModal] = useState<boolean>(false);
 
   const contextValue: GlobalContextProps = {
     monthIndex,
     setMonthIndex,
+    showEventModal,
+    setShowEventModal,
   };
 
   return (
