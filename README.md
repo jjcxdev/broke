@@ -4,7 +4,7 @@
 
 **broke** is a financial tracking application aimed at managing and visualizing your finances. Built with Next.js and TypeScript, the app brings a variety of features to your fingertips to make personal finance management as straightforward as possible.
 
-![App Screenshot](./screenshot.png)
+![App Screenshot](/broke/public/screenshot.png)
 
 ## Features
 
