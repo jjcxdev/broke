@@ -8,7 +8,8 @@ import { AiOutlineClockCircle } from "react-icons/ai";
 import { LuRepeat2 } from "react-icons/lu";
 import { BsShieldFillCheck } from "react-icons/bs";
 import { userClassColors } from "@/context/GlobalContext";
-import { SavedEvent } from "@/context/GlobalContext";
+import { SavedEvent } from "@/context/Types";
+import { v4 as uuidv4 } from "uuid";
 
 const userClasses = ["Justin", "Karen"]; //change this later for household members in database
 
@@ -47,7 +48,7 @@ const EventModal: React.FC = () => {
       userClass: selectedClass,
       day: daySelected.valueOf().toString(),
       ...(isRecurring && { startDate, endDate }),
-      id: Date.now().toString(),
+      id: uuidv4(),
     };
     dispatchCalEvent({ type: "push", payload: calendarEvent });
     setShowEventModal(false);

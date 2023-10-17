@@ -1,7 +1,8 @@
 import React, { FC, useContext, useEffect, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import GlobalContext from "@/context/GlobalContext";
-import { SavedEvent } from "@/context/GlobalContext";
+import { SavedEvent } from "@/context/Types";
+import { userClassColors } from "@/context/GlobalContext";
 
 interface DayProps {
   day: Dayjs;
@@ -14,6 +15,9 @@ const Day: FC<DayProps> = ({ day, rowIdx }) => {
     useContext(GlobalContext);
 
   useEffect(() => {
+    console.log("savedEvents: ", savedEvents); // Debugging line
+    console.log("day: ", day.format("DD-MM-YY")); // Debugging line
+
     const events = savedEvents.filter(
       (evt) => dayjs(evt.day).format("DD-MM-YY") === day.format("DD-MM-YY"),
     );
@@ -45,7 +49,12 @@ const Day: FC<DayProps> = ({ day, rowIdx }) => {
         }}
       >
         {dayEvents.map((evt, idx) => (
-          <div key={idx} className="{'bg-${} mr-3 p-1 text-sm text-gray-600">
+          <div
+            key={idx}
+            className={`${
+              userClassColors[evt.userClass as keyof typeof userClassColors]
+            } mr-3 p-1 text-sm text-gray-600`}
+          >
             {evt.payee}
           </div>
         ))}

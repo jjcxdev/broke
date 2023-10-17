@@ -2,6 +2,7 @@ import React, { ReactNode, useState, FC, useReducer, useEffect } from "react";
 import GlobalContext from "./GlobalContext";
 import { GlobalContextProps } from "./GlobalContext";
 import dayjs from "dayjs";
+import { SavedEvent, SavedEventAction } from "@/context/Types";
 
 // In-memory store
 let inMemoryStore: SavedEvent[] = [];
@@ -9,16 +10,6 @@ let inMemoryStore: SavedEvent[] = [];
 interface ContextWrapperProps {
   children: ReactNode;
 }
-
-interface SavedEvent {
-  id: string;
-}
-
-// Define action types
-type SavedEventAction =
-  | { type: "push"; payload: SavedEvent }
-  | { type: "update"; payload: SavedEvent }
-  | { type: "delete"; payload: { id: string } };
 
 // Reducer function
 function savedEventsReducer(
@@ -35,7 +26,10 @@ function savedEventsReducer(
     case "delete":
       return state.filter((evt) => evt.id !== action.payload.id);
     default:
-      throw new Error();
+      console.warn(
+        `Unhandled action type: ${(action as SavedEventAction).type}`,
+      );
+      return state;
   }
 }
 
@@ -53,6 +47,7 @@ const ContextWrapper: FC<ContextWrapperProps> = ({ children }) => {
   const [monthIndex, setMonthIndex] = useState<number>(dayjs().month());
   const [showEventModal, setShowEventModal] = useState<boolean>(false);
   const [daySelected, setDaySelected] = useState(dayjs());
+  const [selectedEvent, setSelectedEvent] = useState<SavedEvent | null>(null);
 
   // Initialize useReducer
   const [savedEvents, dispatchCalEvent] = useReducer(
@@ -65,6 +60,7 @@ const ContextWrapper: FC<ContextWrapperProps> = ({ children }) => {
   useEffect(() => {
     inMemoryStore = [...savedEvents];
     localStorage.setItem("savedEvents", JSON.stringify(savedEvents));
+    console.log("Updated savedEvents", savedEvents);
   }, [savedEvents]);
 
   const contextValue: GlobalContextProps = {
@@ -76,6 +72,8 @@ const ContextWrapper: FC<ContextWrapperProps> = ({ children }) => {
     setDaySelected,
     savedEvents,
     dispatchCalEvent,
+    selectedEvent,
+    setSelectedEvent,
   };
 
   return (
