@@ -1,9 +1,13 @@
-import { type Config } from "tailwindcss";
-
-export default {
-  content: ["./src/**/*.{js,ts,jsx,tsx}"],
+module.exports = {
+  purge: {
+    content: ['./src/**/*.{js,ts,jsx,tsx}'],
+  },
   theme: {
-    extend: {},
+    extend: {
+      gridTemplateColumns: {
+        '1/5': '1fr 5fr',
+      },
+    },
   },
   plugins: [],
-} satisfies Config;
+};

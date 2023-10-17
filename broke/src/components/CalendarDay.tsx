@@ -1,5 +1,7 @@
-import React, { FC } from "react";
+import React, { FC, useContext, useEffect, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
+import GlobalContext from "@/context/GlobalContext";
+import { SavedEvent } from "@/context/GlobalContext";
 
 interface DayProps {
   day: Dayjs;
@@ -7,9 +9,16 @@ interface DayProps {
 }
 
 const Day: FC<DayProps> = ({ day, rowIdx }) => {
-  // console.log("Rendering Day with:", day.format("DD-MM-YY"), "Row:", rowIdx);
-  // console.log("Component day:", day.format("DD-MM-YY"));
-  // console.log("Current day:", dayjs().format("DD-MM-YY"));
+  const [dayEvents, setDayEvents] = useState<SavedEvent[]>([]);
+  const { setDaySelected, setShowEventModal, savedEvents } =
+    useContext(GlobalContext);
+
+  useEffect(() => {
+    const events = savedEvents.filter(
+      (evt) => dayjs(evt.day).format("DD-MM-YY") === day.format("DD-MM-YY"),
+    );
+    setDayEvents(events);
+  }, [savedEvents, day]);
 
   function getCurrentDayClass() {
     const isCurrentDay =
@@ -28,6 +37,19 @@ const Day: FC<DayProps> = ({ day, rowIdx }) => {
           {day.format("DD")}
         </p>
       </header>
+      <div
+        className="flex-1 cursor-pointer"
+        onClick={() => {
+          setDaySelected(day);
+          setShowEventModal(true);
+        }}
+      >
+        {dayEvents.map((evt, idx) => (
+          <div key={idx} className="{'bg-${} mr-3 p-1 text-sm text-gray-600">
+            {evt.payee}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
