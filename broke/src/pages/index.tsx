@@ -13,10 +13,19 @@ import { getMonth } from "../utils";
 import GlobalContext from "@/context/GlobalContext";
 import EventModal from "@/components/EventModal";
 import Itinerary from "@/components/Itinerary";
+import "dayjs/locale/en-gb";
+import dayjs from "dayjs";
+
+dayjs.locale("en-gb");
 
 export default function Home() {
   const { daySelected, monthIndex, showEventModal } = useContext(GlobalContext);
   const [currentMonth, setCurrentMonth] = useState(getMonth());
+
+  // Set the locale for Day.js
+  useEffect(() => {
+    dayjs.locale("en-gb");
+  }, []);
 
   // Observe changes in monthIndex
   useEffect(() => {

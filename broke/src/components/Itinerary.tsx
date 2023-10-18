@@ -22,8 +22,29 @@ const userClassColors: UserClassColors = {
 
 const Itinerary: FC<ItineraryProps> = ({ day }) => {
   const [dayEvents, setDayEvents] = useState<SavedEvent[]>([]);
+  const [currentWeek, setCurrentWeek] = useState(dayjs().startOf("week"));
   const { setDaySelected, setShowEventModal, savedEvents } =
     useContext(GlobalContext);
+
+  // Set the current week when the component mounts
+  useEffect(() => {
+    setCurrentWeek(dayjs().startOf("week"));
+  }, []);
+
+  // Fetch events based on the current week
+  useEffect(() => {
+    const startOfWeek = currentWeek;
+    const endOfWeek = currentWeek.clone().endOf("week");
+
+    const events = savedEvents.filter((evt) => {
+      const currentEventDay: Dayjs = dayjs(evt.day);
+      return (
+        currentEventDay.isSameOrAfter(startOfWeek) &&
+        currentEventDay.isSameOrBefore(endOfWeek)
+      );
+    });
+    setDayEvents(events);
+  }, [savedEvents, currentWeek]);
 
   useEffect(() => {
     const startOfWeek = day.startOf("week");
@@ -40,37 +61,50 @@ const Itinerary: FC<ItineraryProps> = ({ day }) => {
   }, [savedEvents, day]);
 
   return (
-    <div className="flex flex-col">
-      <header className="my-2 flex justify-center">
-        <p className="text-lg font-bold">{day.format("dddd, MMMM DD")}</p>
-      </header>
-      <ul className="list-inside list-decimal">
+    <div className="h-fit w-full rounded-lg bg-neutral-500">
+      <div className="px-4 py-2">
         {dayEvents.map((evt, idx) => {
+          // Start of map function
           const bgColor = evt.userClass
             ? userClassColors[evt.userClass]
             : "defaultColor";
           return (
-            <li key={idx} style={{ backgroundColor: bgColor }}>
-              <div className="flex justify-between">
-                <span className="font-bold">{`$${evt.amount}`}</span>
-                <span className="font-bold">{`${evt.payee}`}</span>
-                {/*If recurring is true, display icon*/}
-                {evt.isRecurring && (
-                  <span className="">
-                    <LuRepeat2 />
-                  </span>
-                )}
-                {/*If preauthorized is true, display icon*/}
-                {evt.isPreAuthorized && (
-                  <span className="">
-                    <BsShieldFillCheck />
-                  </span>
-                )}
+            <div key={idx} style={{ backgroundColor: bgColor }}>
+              <div className="flex flex-row items-center justify-between gap-8">
+                <h2 className="text-3xl font-light text-white">
+                  {`$${evt.amount}`}
+                </h2>
+                <div className="flex flex-row items-center justify-between gap-1">
+                  <div className="h-fit w-fit rounded-md bg-white px-1 py-[2px] text-xs text-black">
+                    30/36
+                  </div>
+                  <div>
+                    {/*If recurring is true, display icon*/}
+                    {evt.isRecurring && (
+                      <span className="">
+                        <LuRepeat2 />
+                      </span>
+                    )}
+                  </div>
+                  <div>
+                    {/*If preauthorized is true, display icon*/}
+                    {evt.isPreAuthorized && (
+                      <span className="">
+                        <BsShieldFillCheck />
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
-            </li>
+              <div className="flex flex-row gap-2">
+                <div className="w-fit text-xs font-thin text-white">
+                  <span className="font-bold">{`${evt.payee}`}</span>
+                </div>
+              </div>
+            </div>
           );
         })}
-      </ul>
+      </div>
     </div>
   );
 };

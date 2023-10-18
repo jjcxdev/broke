@@ -7,9 +7,13 @@ export function getMonth(month: number = dayjs().month()): Dayjs[][] {
   // Get the first day of the month (0 = Sunday, 1 = Monday, ...)
   const firstDayOfTheMonth: number = dayjs(new Date(year, month, 1)).day();
 
+  //Manually adjust first day of the week to Monday
+  const adjustedFirstDay =
+    firstDayOfTheMonth === 0 ? 6 : firstDayOfTheMonth - 1;
+
   // Initialize the day count
   // Start with a negative number to fill the first row with days from the previous month
-  let currentMonthCount: number = 1 - firstDayOfTheMonth;
+  let currentMonthCount: number = 1 - adjustedFirstDay;
 
   // Initialize the 2D array (matrix) to store the days
   const daysMatrix: Dayjs[][] = [];
