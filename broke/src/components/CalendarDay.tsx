@@ -15,12 +15,27 @@ const Day: FC<DayProps> = ({ day, rowIdx }) => {
     useContext(GlobalContext);
 
   useEffect(() => {
-    console.log("savedEvents: ", savedEvents); // Debugging line
-    console.log("day: ", day.format("DD-MM-YY")); // Debugging line
+    // console.log("savedEvents: ", savedEvents); // Debugging line
+    // console.log("day: ", day.format("DD-MM-YY")); // Debugging line
+
+    // Log each event day from savedEvents
+    savedEvents.forEach((evt) => {
+      // console.log(
+      //   "Event day from savedEvents: ",
+      //   dayjs(evt.day).format("DD-MM-YY"),
+      // );
+    });
+
+    // Log the day being rendered by this Day component
+    // console.log("Day from Day component: ", day.format("DD-MM-YY"));
 
     const events = savedEvents.filter(
       (evt) => dayjs(evt.day).format("DD-MM-YY") === day.format("DD-MM-YY"),
     );
+
+    // Log the filtered events
+    // console.log("Filtered events: ", events);
+
     setDayEvents(events);
   }, [savedEvents, day]);
 
@@ -55,7 +70,8 @@ const Day: FC<DayProps> = ({ day, rowIdx }) => {
               userClassColors[evt.userClass as keyof typeof userClassColors]
             } mr-3 p-1 text-sm text-gray-600`}
           >
-            {evt.payee}
+            <span className="font-bold">{`$${evt.amount}`}</span>
+            <span className="font-light">{` ${evt.payee}`}</span>
           </div>
         ))}
       </div>

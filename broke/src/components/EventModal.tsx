@@ -1,5 +1,5 @@
-import GlobalContext from "@/context/GlobalContext";
 import React, { useContext, useState } from "react";
+import GlobalContext from "@/context/GlobalContext";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { AiOutlineCloseCircle } from "react-icons/ai";
@@ -46,7 +46,7 @@ const EventModal: React.FC = () => {
       isRecurring,
       isPreAuthorized,
       userClass: selectedClass,
-      day: daySelected.valueOf().toString(),
+      day: daySelected,
       ...(isRecurring && { startDate, endDate }),
       id: uuidv4(),
     };
@@ -66,7 +66,7 @@ const EventModal: React.FC = () => {
           </span>
           <button
             onClick={() => {
-              console.log("Close button clicked");
+              // console.log("Close button clicked");
               setShowEventModal(false);
             }}
           >
@@ -168,7 +168,7 @@ const EventModal: React.FC = () => {
                         : "bg-gray-200 text-black"
                     }`}
                     onClick={() => {
-                      console.log("UserClass button clicked");
+                      // console.log("UserClass button clicked");
                       setSelectedClass(userClass);
                     }}
                   >

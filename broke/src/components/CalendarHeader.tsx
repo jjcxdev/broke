@@ -1,6 +1,6 @@
+import React, { useContext } from "react";
 import GlobalContext from "@/context/GlobalContext";
 import dayjs from "dayjs";
-import React, { useContext } from "react";
 import { FaChevronLeft } from "react-icons/fa";
 import { FaChevronRight } from "react-icons/fa";
 

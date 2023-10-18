@@ -3,10 +3,11 @@ import dayjs from "dayjs";
 import { SavedEvent, SavedEventAction } from "@/context/Types";
 
 // ColorMapping.ts (or within GlobalContext)
-export const userClassColors = {
-  Justin: "bg-blue-500",
-  Karen: "bg-red-500",
+export type UserClassColors = {
+  [key: string]: string;
 };
+
+export const userClassColors: UserClassColors = {};
 
 export interface GlobalContextProps {
   monthIndex: number;
@@ -19,6 +20,8 @@ export interface GlobalContextProps {
   dispatchCalEvent: React.Dispatch<SavedEventAction>;
   selectedEvent: SavedEvent | null;
   setSelectedEvent: React.Dispatch<React.SetStateAction<SavedEvent | null>>;
+  userClassColors: UserClassColors;
+  updateUserClassColors: (newMapping: UserClassColors) => void;
 }
 
 const GlobalContext = React.createContext<GlobalContextProps>({
@@ -32,6 +35,8 @@ const GlobalContext = React.createContext<GlobalContextProps>({
   dispatchCalEvent: ({ type, payload }) => {},
   selectedEvent: null,
   setSelectedEvent: () => {},
+  userClassColors: {},
+  updateUserClassColors: (newMapping: UserClassColors) => {},
 });
 
 export default GlobalContext;

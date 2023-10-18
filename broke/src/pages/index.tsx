@@ -12,9 +12,10 @@ import CalendarHeader from "@/components/CalendarHeader";
 import { getMonth } from "../utils";
 import GlobalContext from "@/context/GlobalContext";
 import EventModal from "@/components/EventModal";
+import Itinerary from "@/components/Itinerary";
 
 export default function Home() {
-  const { monthIndex, showEventModal } = useContext(GlobalContext);
+  const { daySelected, monthIndex, showEventModal } = useContext(GlobalContext);
   const [currentMonth, setCurrentMonth] = useState(getMonth());
 
   // Observe changes in monthIndex
@@ -61,7 +62,7 @@ export default function Home() {
 
         <div id="itinerary" className="flex w-3/12 flex-col gap-1 p-4">
           <WeekCard />
-          <BillCard />
+          <Itinerary day={daySelected} />
         </div>
       </main>
     </>

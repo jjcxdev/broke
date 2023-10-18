@@ -1,6 +1,8 @@
 import React, { ReactNode, useState, FC, useReducer, useEffect } from "react";
-import GlobalContext from "./GlobalContext";
-import { GlobalContextProps } from "./GlobalContext";
+import GlobalContext, {
+  UserClassColors,
+  GlobalContextProps,
+} from "./GlobalContext";
 import dayjs from "dayjs";
 import { SavedEvent, SavedEventAction } from "@/context/Types";
 
@@ -18,7 +20,7 @@ function savedEventsReducer(
 ): SavedEvent[] {
   switch (action.type) {
     case "push":
-      return [...state, action.payload];
+      return [...state, { ...action.payload, day: dayjs(action.payload.day) }];
     case "update":
       return state.map((evt) =>
         evt.id === action.payload.id ? action.payload : evt,
@@ -37,7 +39,10 @@ function initEvents(): SavedEvent[] {
   if (typeof window !== "undefined") {
     const savedEventsFromStorage = localStorage.getItem("savedEvents");
     return savedEventsFromStorage
-      ? JSON.parse(savedEventsFromStorage)
+      ? JSON.parse(savedEventsFromStorage).map((event: any) => ({
+          ...event,
+          day: dayjs(event.day),
+        }))
       : [...inMemoryStore];
   }
   return [...inMemoryStore]; // Fallback to inMemoryStore when on the server
@@ -48,6 +53,10 @@ const ContextWrapper: FC<ContextWrapperProps> = ({ children }) => {
   const [showEventModal, setShowEventModal] = useState<boolean>(false);
   const [daySelected, setDaySelected] = useState(dayjs());
   const [selectedEvent, setSelectedEvent] = useState<SavedEvent | null>(null);
+  const [userClassColors, setUserClassColors] = useState<UserClassColors>({});
+  const updateUserClassColors = (newMapping: UserClassColors) => {
+    setUserClassColors({ ...userClassColors, ...newMapping });
+  };
 
   // Initialize useReducer
   const [savedEvents, dispatchCalEvent] = useReducer(
@@ -59,8 +68,16 @@ const ContextWrapper: FC<ContextWrapperProps> = ({ children }) => {
   // Use useEffect to save to localStorage
   useEffect(() => {
     inMemoryStore = [...savedEvents];
-    localStorage.setItem("savedEvents", JSON.stringify(savedEvents));
-    console.log("Updated savedEvents", savedEvents);
+    localStorage.setItem(
+      "savedEvents",
+      JSON.stringify(
+        savedEvents.map((event) => ({
+          ...event,
+          day: event.day.toISOString(),
+        })),
+      ),
+    );
+    // console.log("Updated savedEvents", savedEvents);
   }, [savedEvents]);
 
   const contextValue: GlobalContextProps = {
@@ -74,6 +91,8 @@ const ContextWrapper: FC<ContextWrapperProps> = ({ children }) => {
     dispatchCalEvent,
     selectedEvent,
     setSelectedEvent,
+    userClassColors,
+    updateUserClassColors,
   };
 
   return (

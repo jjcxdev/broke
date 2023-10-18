@@ -3,5 +3,21 @@
 @tailwind utilities;
 
 body {
-  font-family: "Poppins", sans-serif;
+  font-family: "Inter", sans-serif;
+}
+
+/* Custom Reset CSS */
+html,
+body,
+h1,
+h2,
+h3,
+p,
+ul,
+ol,
+li,
+button {
+  margin: 0;
+  padding: 0;
+  border: 0;
 }

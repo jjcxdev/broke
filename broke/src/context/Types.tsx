@@ -1,6 +1,8 @@
+import dayjs from "dayjs";
+
 export interface SavedEvent {
   id: string;
-  day: string; // or Date or dayjs.Dayjs, depending on what you're using
+  day: dayjs.Dayjs; // or Date or dayjs.Dayjs, depending on what you're using
   payee: string;
   amount: string;
   isRecurring: boolean;
