@@ -22,43 +22,24 @@ const userClassColors: UserClassColors = {
 
 const Itinerary: FC<ItineraryProps> = ({ day }) => {
   const [dayEvents, setDayEvents] = useState<SavedEvent[]>([]);
-  const [currentWeek, setCurrentWeek] = useState(dayjs().startOf("week"));
   const { setDaySelected, setShowEventModal, savedEvents } =
     useContext(GlobalContext);
 
-  // Set the current week when the component mounts
+  // Directly get the current date to determine the current week
   useEffect(() => {
-    setCurrentWeek(dayjs().startOf("week"));
-  }, []);
-
-  // Fetch events based on the current week
-  useEffect(() => {
-    const startOfWeek = currentWeek;
-    const endOfWeek = currentWeek.clone().endOf("week");
-
-    const events = savedEvents.filter((evt) => {
-      const currentEventDay: Dayjs = dayjs(evt.day);
-      return (
-        currentEventDay.isSameOrAfter(startOfWeek) &&
-        currentEventDay.isSameOrBefore(endOfWeek)
-      );
-    });
-    setDayEvents(events);
-  }, [savedEvents, currentWeek]);
-
-  useEffect(() => {
-    const startOfWeek = day.startOf("week");
-    const endOfWeek = day.endOf("week");
+    const currentDate = dayjs();
+    const startOfCurrentWeek = currentDate.startOf("week");
+    const endOfCurrentWeek = currentDate.endOf("week");
 
     const events = savedEvents.filter((evt) => {
       const eventDay: Dayjs = dayjs(evt.day);
       return (
-        eventDay.isSameOrAfter(startOfWeek) &&
-        eventDay.isSameOrBefore(endOfWeek)
+        eventDay.isSameOrAfter(startOfCurrentWeek) &&
+        eventDay.isSameOrBefore(endOfCurrentWeek)
       );
     });
     setDayEvents(events);
-  }, [savedEvents, day]);
+  }, [savedEvents]);
 
   return (
     <div className="h-fit w-full rounded-lg bg-neutral-500">
