@@ -2,7 +2,6 @@ import React, { Dispatch, SetStateAction } from "react";
 import dayjs from "dayjs";
 import { SavedEvent, SavedEventAction } from "@/context/Types";
 
-// ColorMapping.ts (or within GlobalContext)
 export type UserClassColors = {
   [key: string]: string;
 };

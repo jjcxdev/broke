@@ -7,19 +7,19 @@ import { RxDragHandleDots2 } from "react-icons/rx";
 import { AiOutlineClockCircle } from "react-icons/ai";
 import { LuRepeat2 } from "react-icons/lu";
 import { BsShieldFillCheck } from "react-icons/bs";
-import { userClassColors } from "@/context/GlobalContext";
-import { SavedEvent } from "@/context/Types";
+import { RecurrenceFrequency, SavedEvent } from "@/context/Types";
 import { v4 as uuidv4 } from "uuid";
-
-const userClasses = ["Justin", "Karen"]; //change this later for household members in database
+import { tempUsers } from "@/database/tempUsers";
 
 const EventModal: React.FC = () => {
   const [payee, setPayee] = useState("");
   const [amount, setAmount] = useState("");
   const [isRecurring, setIsRecurring] = useState(false);
   const [isPreAuthorized, setIsPreAuthorized] = useState(false);
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [recurrenceFrequency, setRecurrenceFrequency] =
+    useState<RecurrenceFrequency | null>(null);
 
   const { savedEvents, setShowEventModal, daySelected, dispatchCalEvent } =
     useContext(GlobalContext);
@@ -40,6 +40,13 @@ const EventModal: React.FC = () => {
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
+    // Check if isRecurring is true but startDate or endDate is missing
+    if (isRecurring && (!startDate || !endDate)) {
+      alert("Start and end dates are required for recurring events");
+      return;
+    }
+
     const calendarEvent: SavedEvent = {
       payee,
       amount,
@@ -47,11 +54,27 @@ const EventModal: React.FC = () => {
       isPreAuthorized,
       userClass: selectedClass,
       day: daySelected,
-      ...(isRecurring && { startDate, endDate }),
+      startDate: startDate ? new Date(startDate.toISOString()) : null,
+      endDate: endDate ? new Date(endDate.toISOString()) : null,
       id: uuidv4(),
     };
-    dispatchCalEvent({ type: "push", payload: calendarEvent });
-    setShowEventModal(false);
+
+    console.log("Sending this data to server:", calendarEvent);
+
+    fetch("/api/createEvent", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(calendarEvent),
+    }).then(async (response) => {
+      if (!response.ok) {
+        const data = await response.json();
+        console.log("Error Data:", data);
+        throw new Error("Something went wrong");
+      }
+      return response.json();
+    });
   }
 
   return (
@@ -121,18 +144,39 @@ const EventModal: React.FC = () => {
                 </label>
               </div>
               {isRecurring && (
-                <div className="flex flex-col">
-                  <label>Start Date:</label>
-                  <DatePicker
-                    selected={startDate}
-                    onChange={(date) => setStartDate(date as Date)}
-                  />
-                  <label>End Date:</label>
-                  <DatePicker
-                    selected={endDate}
-                    onChange={(date) => setEndDate(date as Date)}
-                  />
-                </div>
+                <>
+                  <div className="flex flex-col">
+                    <label>Start Date:</label>
+                    <DatePicker
+                      selected={startDate}
+                      onChange={(date) => setStartDate(date as Date)}
+                    />
+                    <label>Frequency:</label>
+                    <select
+                      onChange={(e) =>
+                        setRecurrenceFrequency(
+                          e.target.value as RecurrenceFrequency,
+                        )
+                      }
+                      required
+                    >
+                      <option value="" disabled selected>
+                        Select Frequency
+                      </option>
+                      <option value={RecurrenceFrequency.DAILY}>Daily</option>
+                      <option value={RecurrenceFrequency.WEEKLY}>Weekly</option>
+                      <option value={RecurrenceFrequency.MONTHLY}>
+                        Monthly
+                      </option>
+                      <option value={RecurrenceFrequency.YEARLY}>Yearly</option>
+                    </select>
+                    <label>End Date:</label>
+                    <DatePicker
+                      selected={endDate}
+                      onChange={(date) => setEndDate(date as Date)}
+                    />
+                  </div>
+                </>
               )}
               <div className="flex items-center">
                 <input
@@ -154,27 +198,27 @@ const EventModal: React.FC = () => {
             <p>{daySelected.format("dddd, MMMM DD")}</p>
             <span className="text-gray-400">
               <div className="flex gap-x-2">
-                {userClasses.map((userClass, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    className={`rounded-full px-4 py-2 ${
-                      selectedClass === userClass
-                        ? `${
-                            userClassColors[
-                              userClass as keyof typeof userClassColors
-                            ]
-                          } text-white`
-                        : "bg-gray-200 text-black"
-                    }`}
-                    onClick={() => {
-                      // console.log("UserClass button clicked");
-                      setSelectedClass(userClass);
-                    }}
-                  >
-                    {userClass}
-                  </button>
-                ))}
+                {tempUsers.map((tempUser, i) => {
+                  console.log(tempUser.color);
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      style={{ backgroundColor: tempUser.color }}
+                      className={`rounded-full px-4 py-2 ${
+                        selectedClass === tempUser.name
+                          ? "text-white"
+                          : "text-black"
+                      }`}
+                      onClick={() => {
+                        // console.log("UserClass button clicked");
+                        setSelectedClass(tempUser.name);
+                      }}
+                    >
+                      {tempUser.name}
+                    </button>
+                  );
+                })}
               </div>
             </span>
           </div>
@@ -182,10 +226,7 @@ const EventModal: React.FC = () => {
         <footer className="mt-5 flex w-full justify-end border-t p-3">
           <button
             type="submit"
-            className={`mb-1 mr-3 truncate p-1 text-sm text-gray-600 ${
-              userClassColors[selectedClass as keyof typeof userClassColors] ||
-              "bg-gray-400"
-            }`}
+            className="mb-1 mr-3 truncate bg-gray-400 p-1 text-sm text-gray-600"
           >
             Save
           </button>

@@ -3,6 +3,7 @@ import dayjs, { Dayjs } from "dayjs";
 import GlobalContext from "@/context/GlobalContext";
 import { SavedEvent } from "@/context/Types";
 import { userClassColors } from "@/context/GlobalContext";
+import { tempUsers } from "@/database/tempUsers";
 
 interface DayProps {
   day: Dayjs;
@@ -63,17 +64,22 @@ const Day: FC<DayProps> = ({ day, rowIdx }) => {
           setShowEventModal(true);
         }}
       >
-        {dayEvents.map((evt, idx) => (
-          <div
-            key={idx}
-            className={`${
-              userClassColors[evt.userClass as keyof typeof userClassColors]
-            } mr-3 p-1 text-sm text-gray-600`}
-          >
-            <span className="font-bold">{`$${evt.amount}`}</span>
-            <span className="font-light">{` ${evt.payee}`}</span>
-          </div>
-        ))}
+        {dayEvents.map((evt, idx) => {
+          const eventColor = tempUsers.find(
+            (user) => user.name === evt.userClass,
+          )?.color;
+
+          return (
+            <div
+              key={idx}
+              style={{ backgroundColor: eventColor ?? "defaultColor" }}
+              className={`rounded-lg px-2 py-1 text-sm text-neutral-100`}
+            >
+              <span className="font-bold">{`$${evt.amount}`}</span>
+              <span className="font-light">{` ${evt.payee}`}</span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

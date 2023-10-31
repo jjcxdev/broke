@@ -1,5 +1,12 @@
 import dayjs from "dayjs";
 
+export enum RecurrenceFrequency {
+  DAILY = "daily",
+  WEEKLY = "weekly",
+  MONTHLY = "monthly",
+  YEARLY = "yearly",
+}
+
 export interface SavedEvent {
   id: string;
   day: dayjs.Dayjs; // or Date or dayjs.Dayjs, depending on what you're using
@@ -8,8 +15,9 @@ export interface SavedEvent {
   isRecurring: boolean;
   isPreAuthorized: boolean;
   userClass: string | null;
-  startDate?: Date; // optional because it depends on 'isRecurring'
-  endDate?: Date; // optional because it depends on 'isRecurring'
+  startDate?: Date | null; // optional because it depends on 'isRecurring'
+  endDate?: Date | null; // optional because it depends on 'isRecurring'
+  recurrenceFrequency?: RecurrenceFrequency;
 }
 
 export type SavedEventAction =

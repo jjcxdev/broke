@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-    provider = "sqlite"
+    provider = "postgresql"
     // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
     // Further reading:
     // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
@@ -14,13 +14,54 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Example {
+model Household {
     id        Int      @id @default(autoincrement())
     name      String
+    adminId   String
+    admin     User     @relation(fields: [adminId], references: [id])
+    events    Event[] // Back-reference
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+}
 
-    @@index([name])
+model User {
+    id            String      @id @default(cuid())
+    name          String?
+    email         String?     @unique
+    emailVerified DateTime?
+    image         String?
+    accounts      Account[]
+    sessions      Session[]
+    households    Household[] // Back-reference
+    color         String? // new field
+}
+
+model Event {
+    id              Int          @id @default(autoincrement())
+    householdId     Int
+    household       Household    @relation(fields: [householdId], references: [id])
+    date            DateTime
+    payee           String?
+    amount          Float?
+    isRecurring     Boolean?
+    isPreAuthorized Boolean?
+    startDate       DateTime?
+    endDate         DateTime?
+    recurrence      Recurrence[]
+}
+
+model Recurrence {
+    id        Int       @id @default(autoincrement())
+    frequency Frequency // using an enum
+    eventId   Int // Foreign key
+    event     Event     @relation(fields: [eventId], references: [id], onDelete: Cascade) // Connect Resource model to Event Model
+}
+
+enum Frequency {
+    DAILY
+    WEEKLY
+    MONTHLY
+    YEARLY
 }
 
 // Necessary for Next auth
@@ -48,16 +89,6 @@ model Session {
     userId       String
     expires      DateTime
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
 }
 
 model VerificationToken {
